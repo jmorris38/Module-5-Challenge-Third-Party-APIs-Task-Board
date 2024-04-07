@@ -41,36 +41,45 @@ function createTaskCard(task) {
   return card;
 }
 
-// function to render the task list and make cards draggable
+// Function to render the task list and make cards draggable
 function renderTaskList() {
-
+  // Empty the task cards containers to avoid duplicating cards
   $("#todo-cards").empty();
   $("#in-progress-cards").empty();
   $("#done-cards").empty();
 
+  // Loop through each task in the task list
   taskList.forEach((task) => {
+    // Create a card for the current task
     const card = createTaskCard(task);
+    
+    // Append the card to the appropriate status lane based on task status
     $(`#${task.status}-cards`).append(card);
   });
 
+  // Add event listener for delete button on each task card if there are tasks
   if (taskList.length > 0) {
     $(".delete-task").on("click", handleDeleteTask);
   }
 
+  // Make task cards draggable
   $(".draggable").draggable({
     opacity: 0.7,
     zIndex: 100,
     helper: function (e) {
+      // Clone the original card being dragged
       const original = $(e.target).hasClass("ui-draggable")
         ? $(e.target)
         : $(e.target).closest(".ui-draggable");
 
+      // Set the width of the clone to match the original
       return original.clone().css({
         width: original.outerWidth(),
       });
     },
   });
 }
+
 
 // function to handle adding a new task
 function handleAddTask(event) {
@@ -88,11 +97,12 @@ function handleAddTask(event) {
   };
   taskList.push(tasks);
 
-  localStorage.setItem("tasks_board", JSON.stringify(taskList));
-  renderTaskList();
+  localStorage.setItem("tasks_board", JSON.stringify(taskList)); // Save updated task list to localStorage
+  renderTaskList(); // Render updated task list
 
-  $("#formModal").modal('hide');
+  $("#formModal").modal('hide'); // Hide the modal after adding task
 
+  // Reset form values
   $("#taskTitle").val("");
   $("#taskDueDate").val("");
   $("#taskDescription").val("");
@@ -100,45 +110,43 @@ function handleAddTask(event) {
 
 // function to handle deleting a task
 function handleDeleteTask(event) {
-
   const taskId = $(this).attr("data-task-id");
   taskList = taskList.filter((task) => task.id !== parseInt(taskId));
   $(this).closest(".card").remove();
-  localStorage.setItem("tasks", JSON.stringify(taskList));
-  renderTaskList();
+  localStorage.setItem("tasks", JSON.stringify(taskList)); // Update localStorage with the updated task list
+  renderTaskList(); // Render updated task list
 }
 
 // function to handle dropping a task into a new status lane
 function handleDrop(event, ui) {
-
   const taskId = ui.helper.attr("id");
   let newStatus = $(this).attr("id");
   if (newStatus === "to-do") {
     newStatus = "todo";
   }
   taskList = taskList.map((task) => {
-
     if (task.id === parseInt(taskId)) {
       task.status = newStatus;
     }
-
     return task;
   });
-  localStorage.setItem("tasks", JSON.stringify(taskList));
-  renderTaskList();
+  localStorage.setItem("tasks", JSON.stringify(taskList)); // Update localStorage with the updated task list
+  renderTaskList(); // Render updated task list
 }
 
 // UI Handler for Cards
 $(document).ready(function () {
-  renderTaskList();
+  renderTaskList(); // Render initial task list
 
-  $(submitButton).on("click", handleAddTask);
+  $(submitButton).on("click", handleAddTask); // Add event listener to submit button for adding tasks
 
+  // Make status lanes droppable
   $(".lane").droppable({
     accept: ".draggable",
     drop: handleDrop,
   });
 
+  // Initialize datepicker for task due date
   $("#taskDueDate").datepicker({
     changeMonth: true,
     changeYear: true,
