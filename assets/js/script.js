@@ -88,8 +88,14 @@ function handleAddTask(event) {
   };
   taskList.push(tasks);
 
-  localStorage.setItem("tasks", JSON.stringify(taskList));
+  localStorage.setItem("tasks_board", JSON.stringify(taskList));
   renderTaskList();
+
+  $("#formModal").modal('hide');
+
+  $("#taskTitle").val("");
+  $("#taskDueDate").val("");
+  $("#taskDescription").val("");
 }
 
 // function to handle deleting a task
